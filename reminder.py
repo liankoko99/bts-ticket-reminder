@@ -43,14 +43,18 @@ def send_msg(text, event_name, type):
 
 # 獲取香港時間
 now_hkt = datetime.utcnow() + timedelta(hours=8)
+now_hkt_str = now_hkt.strftime("%Y-%m-%d")
+now_hkt_time = now_hkt.strftime("%H:%M")
 
-# --- 修改後：登記提醒 (改為 17:00 & 22:00) ---
-if now_hkt.strftime("%Y-%m-%d") == "2026-05-22":
-    now_hkt_time = now_hkt.strftime("%H:%M")
-    if now_hkt_time == "17:00": 
-        send_msg("⚠️ 溫馨提示：記得今日 17:40 ，處理 ARMY Membership 登記！", "ARMY_Reg", "1700")
-    if now_hkt_time == "22:00": 
-        send_msg("⚠️ 溫馨提示：記得今日 22:00，處理 ARMY Membership 登記！", "ARMY_Reg", "2200")
+# --- 升級：登記提醒 (改為範圍判定，更穩陣) ---
+if now_hkt_str == "2026-05-22":
+    # 只要香港時間在 17:00 到 17:59 之間，手動點擊都會發送 17:00 提示 (用於你現在測試)
+    if "17:00" <= now_hkt_time <= "17:59": 
+        send_msg("⚠️ 溫馨提示：記得今日 17:00 留意 Weverse，處理 ARMY Membership 登記！", "ARMY_Reg", "1700")
+        
+    # 只要香港時間在 22:00 到 22:15 之間，就會發送 22:00 提示
+    if "22:00" <= now_hkt_time <= "22:15": 
+        send_msg("⚠️ 溫馨提示：記得今日 22:00 留意 Weverse，處理 ARMY Membership 登記！", "ARMY_Reg", "2200")
 
 # 搶票倒數
 for name, time_str in events:
