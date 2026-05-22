@@ -43,29 +43,33 @@ def send_msg(text, event_name, type):
 
 # 獲取香港時間
 now_hkt = datetime.utcnow() + timedelta(hours=8)
-now_hkt_str = now_hkt.strftime("%Y-%m-%d")
-now_hkt_time = now_hkt.strftime("%H:%M")
 
-# --- 升級：登記提醒 (改為範圍判定，更穩陣) ---
-if now_hkt_str == "2026-05-22":
-    # 只要香港時間在 17:00 到 17:59 之間，手動點擊都會發送 17:00 提示 (用於你現在測試)
-    if "17:00" <= now_hkt_time <= "17:59": 
-        send_msg("⚠️ 溫馨提示：記得今日 17:00 留意 Weverse，處理 ARMY Membership 登記！", "ARMY_Reg", "1700")
-        
-    # 只要香港時間在 22:00 到 22:15 之間，就會發送 22:00 提示
-    if "22:00" <= now_hkt_time <= "22:15": 
-        send_msg("⚠️ 溫馨提示：記得今日 22:00 留意 Weverse，處理 ARMY Membership 登記！", "ARMY_Reg", "2200")
-
-# 搶票倒數
+# 搶票倒數邏輯
 for name, time_str in events:
     event_time = datetime.strptime(time_str, "%Y-%m-%d %H:%M")
     diff = (event_time - now_hkt).total_seconds() / 60
     
     if diff < 0: continue 
     
-    if 1439 <= diff <= 1441:
-        send_msg(f"📅 明日提醒：{name} 將於明日開賣，請做好準備！", name, "day_before")
-    elif 59 <= diff <= 61:
-        send_msg(f"📢 售票倒數：{name} 仲有 1 個鐘開賣！", name, "hour_before")
-    elif 14 <= diff <= 16:
-        send_msg(f"🚨 最後衝刺：{name} 仲有 15 分鐘！快啲準備好！", name, "15min_before")
+    # 提取開賣的具體時間 (例如: 11:00)
+    exact_time = event_time.strftime("%H:%M")
+    
+    # 根據是否為香港場次，自動切換祝福語
+    if "香港" in name:
+        wish_1hour = "祝大家戰勝hkticketing🍀"
+        wish_15min = "祝戰勝移民去火星嘅黃牛😤" # 👈 已成功修改
+    else:
+        wish_1hour = "祝大家搶飛成功🍀"
+        wish_15min = "祝戰勝所有黃牛😤"
+    
+    # 1. 明日提醒 (安全範圍：23.5 - 24.5 小時前)
+    if 1410 <= diff <= 1470:
+        send_msg(f"📅 溫馨提醒：{name} 聽日{exact_time} 正式開賣💣", name, "day_before")
+        
+    # 2. 售票倒數 (安全範圍：50 - 65 分鐘前)
+    elif 50 <= diff <= 65:
+        send_msg(f"📢 售票倒數：{name} 將於 {exact_time} 開賣💣{wish_1hour}", name, "hour_before")
+        
+    # 3. 最後衝刺 (安全範圍：5 - 18 分鐘前)
+    elif 5 <= diff <= 18:
+        send_msg(f"🚨 最後衝刺：{name} 即將於 {exact_time} 開賣💣{wish_15min}", name, "15min_before")
