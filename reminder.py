@@ -44,7 +44,11 @@ def send_msg(text, event_name, type):
 # 獲取香港時間
 now_hkt = datetime.utcnow() + timedelta(hours=8)
 
-# --- 修改後：登記提醒 (改為 17:00 & 22:00) ---
+# 📢 【臨時測試】：只要一執行，就絕對會發送呢條訊息去 Channel
+# 測試完記得刪除呢行
+send_msg("📢 頻道廣播測試：ARMY 搶飛廣播站已成功啟動！大家收唔收到？", "Channel_Test", str(datetime.now().timestamp()))
+
+# 登記提醒 (今日 5月22日)
 if now_hkt.strftime("%Y-%m-%d") == "2026-05-22":
     now_hkt_time = now_hkt.strftime("%H:%M")
     if now_hkt_time == "17:00": 
@@ -55,13 +59,3 @@ if now_hkt.strftime("%Y-%m-%d") == "2026-05-22":
 # 搶票倒數
 for name, time_str in events:
     event_time = datetime.strptime(time_str, "%Y-%m-%d %H:%M")
-    diff = (event_time - now_hkt).total_seconds() / 60
-    
-    if diff < 0: continue 
-    
-    if 1439 <= diff <= 1441:
-        send_msg(f"📅 明日提醒：{name} 將於明日開賣，請做好準備！", name, "day_before")
-    elif 59 <= diff <= 61:
-        send_msg(f"📢 售票倒數：{name} 仲有 1 個鐘開賣！", name, "hour_before")
-    elif 14 <= diff <= 16:
-        send_msg(f"🚨 最後衝刺：{name} 仲有 15 分鐘！快啲準備好！", name, "15min_before")
