@@ -4,8 +4,8 @@ from datetime import datetime
 
 TOKEN = os.environ['TOKEN']
 CHAT_ID = os.environ['CHAT_ID']
+SENT_FILE = "sent_notifications.txt"
 
-# 售票時間點 (保持不變)
 events = [
     ("高雄 ARMY Presale", "2026-06-02 12:00"),
     ("高雄 General Onsale", "2026-06-04 12:00"),
@@ -23,25 +23,42 @@ events = [
     ("香港 General Onsale", "2026-06-11 11:00"),
 ]
 
-def send_msg(text):
+def send_msg(text, event_name, type):
+    key = f"{event_name}_{type}"
+    # 讀取已發送記錄
+    sent = []
+    if os.path.exists(SENT_FILE):
+        with open(SENT_FILE, "r") as f:
+            sent = f.read().splitlines()
+    
+    # 如果已經發送過，就跳過
+    if key in sent:
+        return
+
+    # 發送訊息
     url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
     params = {'chat_id': CHAT_ID, 'text': text}
-    requests.get(url, params=params)
+    response = requests.get(url, params=params)
+    
+    # 如果成功，記錄下來
+    if response.status_code == 200:
+        with open(SENT_FILE, "a") as f:
+            f.write(key + "\n")
 
 now = datetime.now()
 
-# 強制測試邏輯：只要這段代碼執行，就會傳送測試訊息給你
-send_msg("✅ 測試成功：這是系統自動發送的測試訊息！你的 GitHub 與 Telegram 連接正常。")
-
-# 檢查邏輯 (維持不變，等你測試完畢後這部分就會生效)
+# 開賣提醒邏輯
 for name, time_str in events:
     event_time = datetime.strptime(time_str, "%Y-%m-%d %H:%M")
+    if event_time < now: continue
+        
     diff = event_time - now
     minutes_diff = diff.total_seconds() / 60
     
+    # 判斷並發送 (每個時段只會發一次)
     if 1439 <= minutes_diff <= 1441:
-        send_msg(f"📅 明日提醒：{name} 將於明日開賣，請做好準備！")
+        send_msg(f"📅 明日提醒：{name} 將於明日開賣，請做好準備！", name, "day_before")
     elif 59 <= minutes_diff <= 61:
-        send_msg(f"📢 售票倒數：{name} 仲有 1 個鐘開賣！")
+        send_msg(f"📢 售票倒數：{name} 仲有 1 個鐘開賣！", name, "hour_before")
     elif 14 <= minutes_diff <= 16:
-        send_msg(f"🚨 最後衝刺：{name} 仲有 15 分鐘！快啲準備好！")
+        send_msg(f"🚨 最後衝刺：{name} 仲有 15 分鐘！快啲準備好！", name, "15min_before")
