@@ -3,6 +3,7 @@ name: BTS Ticket Reminder
 on:
   schedule:
     - cron: '* * * * *'
+  workflow_dispatch:
 
 jobs:
   check_time:
