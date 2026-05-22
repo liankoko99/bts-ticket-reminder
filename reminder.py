@@ -28,12 +28,10 @@ def send_msg(text):
     requests.get(url, params=params)
 
 now = datetime.now()
-
 for name, time_str in events:
     event_time = datetime.strptime(time_str, "%Y-%m-%d %H:%M")
     diff = event_time - now
     minutes_diff = diff.total_seconds() / 60
-    
     if 1439 <= minutes_diff <= 1441:
         send_msg(f"📅 明日提醒：{name} 將於明日開賣，請做好準備！")
     elif 59 <= minutes_diff <= 61:
