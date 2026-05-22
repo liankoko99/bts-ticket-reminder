@@ -48,7 +48,7 @@ now_hkt = datetime.utcnow() + timedelta(hours=8)
 if now_hkt.strftime("%Y-%m-%d") == "2026-05-22":
     now_hkt_time = now_hkt.strftime("%H:%M")
     if now_hkt_time == "17:00": 
-        send_msg("⚠️ 溫馨提示：記得今日 17:30 ，處理 ARMY Membership 登記！", "ARMY_Reg", "1700")
+        send_msg("⚠️ 溫馨提示：記得今日 17:45 ，處理 ARMY Membership 登記！", "ARMY_Reg", "1700")
     if now_hkt_time == "22:00": 
         send_msg("⚠️ 溫馨提示：記得今日 22:00，處理 ARMY Membership 登記！", "ARMY_Reg", "2200")
 
